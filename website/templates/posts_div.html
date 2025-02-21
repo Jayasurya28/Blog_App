@@ -26,10 +26,71 @@
     </div>
     <div class="card-body">
       <div class="card-text">{{post.text}}</div>
+      <br/>
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+            {% if user.id in post.likes|map(attribute='author')|list %}
+            <a href="/like-post/{{post.id}}" class="btn btn-sm btn-primary">
+                <i class="fa-solid fa-thumbs-up"></i> 
+            </a>
+            {% else %}
+            <a href="/like-post/{{post.id}}" class="btn btn-sm btn-outline-primary">
+                <i class="fa-regular fa-thumbs-up"></i> 
+            </a>
+            {% endif %}
+            <small class="text-muted ms-1">
+                {% set like_count = post.likes|length %}
+                {% if like_count == 0 %}
+                    No likes
+                {% elif like_count == 1 %}
+                    1 like
+                {% else %}
+                    {{like_count}} likes
+                {% endif %}
+            </small>
+        </div>
+        <div>
+            {% set comment_count = post.comments|length %}
+            {% if comment_count > 0 %}
+            <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{post.id}}" aria-expanded="false" aria-controls="comments-{{post.id}}">
+                View {% if comment_count == 1 %}1 comment{% else %}{{comment_count}} comments{% endif %}
+            </button>
+            {% endif %}
+        </div>
+      </div>
+      <div class="comments mt-3">
+        {% if comment_count > 0 %}
+        <div class="collapse" id="comments-{{post.id}}">
+            {% for comment in post.comments %}
+            <div class="comment mb-2 d-flex justify-content-between align-items-center">
+                <div>
+                    <small>
+                        <a href="/posts/{{comment.user.username}}">{{comment.user.username}}</a>: {{comment.text}}
+                        {% if user.id == comment.author or user.id == post.author %}
+                        <a href="/delete-comment/{{comment.id}}" class="text-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </small>
+                </div>
+                <small class="text-muted">{{comment.date_created.strftime('%Y-%m-%d %H:%M')}}</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <small class="text-muted">No comments</small>
+        {% endif %}
+      </div>
+      <br/>
+      <form class="input-group mb-3" method='POST' action="/create-comment/{{post.id}}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="text" id="text" name="text" class="form-control" placeholder="Comment something!"/>
+        <button type="submit" class="btn btn-primary">Comment</button>
+      </form>
     </div>
-    <div class="card-footer text-muted">{{post.date_created}}</div>
+    <div class="card-footer text-muted">{{post.date_created.strftime('%Y-%m-%d %H:%M')}}</div>
   </div>
-  <br/ > 
+  <br/> 
   {% endfor %}
 </div>
 {% block footer %}
