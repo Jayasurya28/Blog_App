@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 auth = Blueprint("auth", __name__)
 
-
 @auth.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -26,7 +25,6 @@ def login():
 
     return render_template("login.html", user=current_user)
 
-
 @auth.route("/sign-up", methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
@@ -43,7 +41,7 @@ def sign_up():
         elif username_exists:
             flash('Username is already in use.', category='error')
         elif password1 != password2:
-            flash('Password don\'t match!', category='error')
+            flash('Passwords don\'t match!', category='error')
         elif len(username) < 2:
             flash('Username is too short.', category='error')
         elif len(password1) < 6:
@@ -60,7 +58,6 @@ def sign_up():
             return redirect(url_for('views.home'))
 
     return render_template("signup.html", user=current_user)
-
 
 @auth.route("/logout")
 @login_required

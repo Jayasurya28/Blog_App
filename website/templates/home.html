@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-<h1 class="text-center mt-5">Welcome to Magizh Technologies</h1>
-<h2 class="text-center text-secondary mb-5">Eat, Code, Sleep !!</h2>
+<h1 align="center">Welcome to Magizh Technologies</h1>
+<h2 align="center">Eat, Code, Sleep !!</h2>
 
 {% if user.is_authenticated %}
 <h1 align="center">Posts</h1>
@@ -25,25 +25,12 @@
             <br/>
             <div class="d-flex justify-content-between align-items-center">
                 <div>
+                    <span id="likes-count-{{post.id}}">{{ post.likes|length }}</span>
                     {% if user.id in post.likes|map(attribute='author')|list %}
-                    <a href="/like-post/{{post.id}}" class="btn btn-sm btn-primary">
-                        <i class="fa-solid fa-thumbs-up"></i> 
-                    </a>
+                    <i class="fas fa-thumbs-up" id="like-button-{{post.id}}" onclick="like({{post.id}})" style="cursor: pointer;"></i>
                     {% else %}
-                    <a href="/like-post/{{post.id}}" class="btn btn-sm btn-outline-primary">
-                        <i class="fa-regular fa-thumbs-up"></i> 
-                    </a>
+                    <i class="far fa-thumbs-up" id="like-button-{{post.id}}" onclick="like({{post.id}})" style="cursor: pointer;"></i>
                     {% endif %}
-                    <small class="text-muted ms-1">
-                        {% set like_count = post.likes|length %}
-                        {% if like_count == 0 %}
-                            No likes
-                        {% elif like_count == 1 %}
-                            1 like
-                        {% else %}
-                            {{like_count}} likes
-                        {% endif %}
-                    </small>
                 </div>
                 <div>
                     {% set comment_count = post.comments|length %}
@@ -79,7 +66,6 @@
             </div>
             <br/>
             <form class="input-group mb-3" method="POST" action="/create-comment/{{post.id}}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="text" id="text" name="text" class="form-control" placeholder="Comment something!"/>
                 <button type="submit" class="btn btn-primary">Comment</button>
             </form>
@@ -95,4 +81,6 @@
     </div>
 </div>
 {% endif %}
+
+<script src="{{ url_for('static', filename='index.js') }}"></script>
 {% endblock %}
